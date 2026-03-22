@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TreeForge</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="toolbar">
+      <div class="brand">
+        <div class="brand__mark" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="brand__copy">
+          <p class="brand__eyebrow">Vanilla Tree Builder</p>
+          <h1>TreeForge</h1>
+        </div>
+      </div>
+
+      <div class="toolbar__actions">
+        <button id="copyButton" class="toolbar-button" type="button">
+          <span class="toolbar-button__icon" aria-hidden="true"></span>
+          <span>Copy Tree</span>
+        </button>
+        <button id="exportTxtButton" class="toolbar-button" type="button">
+          <span class="toolbar-button__icon" aria-hidden="true"></span>
+          <span>Export .txt</span>
+        </button>
+        <button id="importJsonButton" class="toolbar-button" type="button">
+          <span class="toolbar-button__icon" aria-hidden="true"></span>
+          <span>Import JSON</span>
+        </button>
+        <button id="exportJsonButton" class="toolbar-button" type="button">
+          <span class="toolbar-button__icon" aria-hidden="true"></span>
+          <span>Export JSON</span>
+        </button>
+        <button id="resetButton" class="toolbar-button toolbar-button--danger" type="button">
+          <span class="toolbar-button__icon" aria-hidden="true"></span>
+          <span>Reset</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel panel--editor" aria-labelledby="editorTitle">
+        <div class="panel__header">
+          <div>
+            <p class="panel__eyebrow">Left Panel</p>
+            <h2 id="editorTitle">GUI Tree Editor</h2>
+          </div>
+          <p id="statsText" class="panel__meta">1 folder • 0 files</p>
+        </div>
+
+        <div
+          id="treeEditor"
+          class="tree-editor"
+          role="tree"
+          aria-label="File structure editor"
+        ></div>
+
+        <div class="panel__footer">
+          <span>Shortcuts: Enter rename, Delete remove, Escape cancel</span>
+          <span>Drag items to reorder or move them into folders</span>
+        </div>
+      </section>
+
+      <section class="panel panel--output" aria-labelledby="outputTitle">
+        <div class="panel__header">
+          <div>
+            <p class="panel__eyebrow">Right Panel</p>
+            <h2 id="outputTitle">ASCII Tree Output</h2>
+          </div>
+          <p id="outputMeta" class="panel__meta">1 line</p>
+        </div>
+
+        <div class="ascii-frame">
+          <pre id="asciiOutput" class="ascii-output" aria-live="polite"></pre>
+        </div>
+
+        <div class="panel__footer">
+          <span>Live preview updates as the structure changes</span>
+          <span>Export as plain text whenever you are ready</span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <input
+    id="jsonImportInput"
+    type="file"
+    accept=".json,application/json"
+    hidden
+  >
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
