@@ -1,69 +1,172 @@
-# 🌳 GUI File Structure → ASCII Tree
+# 🌳 TreeForge
 
-A small web tool that lets you visually build a file/folder structure and instantly convert it into a clean ASCII tree (like the Linux `tree` command).
+Build a file and folder structure visually and turn it into a clean ASCII tree, like the one the `tree` command prints. Paste it into a README, a pull request, docs or a chat.
+
+```
+my-project/
+├── src/
+│   ├── components/
+│   │   └── Button.jsx
+│   ├── app.js  # entry point
+│   └── utils.js
+├── package.json
+└── README.md
+```
+
+TreeForge is a static web app: no backend, no build step, no dependencies. It runs entirely in your browser, and nothing you type, paste or open is uploaded anywhere.
+
+---
+
+## 🌐 Live demo
+
+👉 https://orangesplash.de/treeforge/
 
 ---
 
 ## ✨ Features
 
-* 📁 Visual file structure editor (GUI)
-* ➕ Add / rename / delete files and folders
-* 🔄 Live ASCII tree preview
-* 📋 Copy to clipboard
-* 📄 Export as `.txt`
-* 🌙 Clean dark mode UI
+**Editing**
+* Visual tree editor: add, rename, duplicate, delete, collapse and expand
+* Drag and drop to move items, or use the keyboard (`Alt` + arrows)
+* Notes: type `app.js # entry point` while renaming. Notes show up as aligned comments in the output.
+* Paths: type `src/lib/util.js` to create the missing folders in one go, or end a name with `/` to turn it into a folder
+* Sort A–Z (folders first) for the whole tree or one folder
+* Undo / redo for every change
+* Full keyboard support (press `?` in the app for the list)
+
+**Output**
+* Styles: Unicode (`├──`), ASCII (`|--`), plain indentation, or a Markdown list
+* Options: show/hide the root, trailing `/` on folders, notes, and a `tree`-style summary line
+* Copy as plain text or as a Markdown code block
+* Download as `.txt`, `.md` or `.json`
+
+**Import**
+* Paste existing `tree` output (Linux/macOS, `--charset ascii`, Windows `tree /f` and `/a`), indented lists, Markdown lists, plain path lists (`src/app.js`), or JSON
+* JSON can be TreeForge's own export, `tree -J` output, or a nested object like `{ "src": { "app.js": null } }`
+* Open or drop a real folder to read its structure, with an ignore list (`node_modules, .git, *.log`, …)
+
+**Everything else**
+* Autosaves in your browser (`localStorage`). Nothing is sent to a server.
+* Share links: the whole tree is compressed into the link itself (`#tree=…`), so sharing needs no server either
+* Light and dark theme (follows your system, with a manual toggle)
+* Installable as an app (PWA) that works offline
+* Stays fast with large trees: the editor only renders visible rows, and imports are capped at 20,000 items
 
 ---
 
-## 🌐 Live Demo
+## 🚀 Installation
 
-Try it here:
-👉 https://orangesplash.de/treeforge/
+There is nothing to build or install. Pick whichever suits you:
 
----
+### 1. Just open it
 
-## 🚀 Usage
+Download or clone the repository and open `index.html` in your browser. Everything except offline mode and "Install app" works straight from disk. Browsers only allow those two on `http(s)://`.
 
-1. Open the app in your browser
-2. Build your file structure using the GUI
-3. View the generated ASCII tree on the right
-4. Copy or export the result
+### 2. Put it on any static host
 
----
+Upload the folder as-is to any web server or static host, such as Apache, nginx, GitHub Pages, Netlify, Cloudflare Pages or shared hosting. It can live in a subfolder (for example `/treeforge/`); all paths are relative. No server-side code or configuration is needed.
 
-## 🧠 Example Output
+Files to upload:
 
 ```
-root/
-├── src/
-│   ├── app.js
-│   └── utils.js
-└── package.json
+index.html
+manifest.webmanifest
+sw.js
+css/
+js/
+icons/
+```
+
+(`tests/`, `tools/`, `package.json` and `README.md` are only for development and can be left out.)
+
+### 3. Install it as an app
+
+Open the hosted version (served over `https://`, or `http://localhost` for local testing) and click **Install** in the toolbar, or use your browser's *Install app* / *Add to Home Screen*. It then opens in its own window and works offline.
+
+### Run it locally over HTTP
+
+To test offline mode and installing, serve the folder with any static server. A zero-dependency one is included:
+
+```bash
+npm start            # or: node tools/serve.js 8080
+# → http://localhost:8080/
+```
+
+`python3 -m http.server` works just as well.
+
+---
+
+## ⌨️ Keyboard shortcuts
+
+| Keys | Action |
+| --- | --- |
+| `↑` `↓` | Move the selection |
+| `←` `→` | Collapse / expand, or go to parent / first child |
+| `Enter` / `F2` | Rename |
+| `N` / `Shift` `N` | New file / new folder |
+| `Delete` | Delete |
+| `Space` | Collapse or expand a folder |
+| `Alt` `↑` `↓` | Move up / down |
+| `Alt` `←` `→` | Move out of a folder / into the folder above |
+| `Shift` `F10` or right-click | More actions |
+| `Ctrl` `Z` / `Ctrl` `Shift` `Z` | Undo / redo (`⌘` on macOS) |
+| `?` | Shortcuts and tips |
+
+---
+
+## 📄 JSON format
+
+**Export JSON** writes plain nested objects, and **Import** reads them back. The format is compatible with files exported by the previous version of TreeForge.
+
+```json
+{
+  "name": "my-project",
+  "type": "folder",
+  "children": [
+    { "name": "src", "type": "folder", "children": [
+      { "name": "app.js", "type": "file", "note": "entry point" }
+    ] },
+    { "name": "README.md", "type": "file" }
+  ]
+}
 ```
 
 ---
 
-## 🛠 Tech Stack
+## 🛠 Development
 
-* HTML
-* CSS
-* Vanilla JavaScript
+Plain HTML, CSS and JavaScript. The scripts are classic (non-module) scripts, so the app also works from `file://`.
+
+```
+index.html            page markup and icon sprite
+css/app.css           styles and light/dark theme tokens
+js/tree.js            tree model: create, move, rename, sort… (pure, no DOM)
+js/format.js          tree → text (Unicode, ASCII, indent, Markdown)
+js/parse.js           text / JSON / paths → tree (importers)
+js/share.js           share-link encoding (compressed, URL-safe)
+js/app.js             user interface
+sw.js                 service worker for offline use
+manifest.webmanifest  app manifest for installing
+tests/                unit tests (Node's built-in test runner)
+tools/serve.js        tiny static server for local testing
+```
+
+Run the tests (Node 18+, nothing to install):
+
+```bash
+npm test
+```
+
+If you add, rename or remove a file the app loads, update the `ASSETS` list in `sw.js` and bump its `VERSION`.
 
 ---
 
-## 📦 Setup
+## 🔒 Privacy
 
-No installation needed.
-
-Just download the files and open `index.html` in your browser.
-
----
-
-## 📌 Notes
-
-* Works fully client-side
-* No dependencies
-* No data is stored or sent anywhere
+* No backend, no analytics, no external requests. Fonts and icons are built in.
+* Your tree is saved only in your own browser's local storage.
+* Folders you open are read locally; only names are used, never file contents.
+* Share links carry the tree in the part of the URL after `#`, which browsers don't send to the server.
 
 ---
 

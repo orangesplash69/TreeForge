@@ -1,103 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>TreeForge</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="description" content="Build a file and folder structure visually and turn it into a clean ASCII tree. Runs entirely in your browser.">
+  <meta name="theme-color" content="#0b0e14" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f3f5f9" media="(prefers-color-scheme: light)">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    // Apply a saved theme before the first paint so the page doesn't flash.
+    try {
+      var savedTheme = localStorage.getItem("treeforge:theme");
+      if (savedTheme === "light" || savedTheme === "dark") {
+        document.documentElement.setAttribute("data-theme", savedTheme);
+      }
+    } catch (error) {}
+  </script>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="toolbar">
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h3.6a2 2 0 0 1 1.5.7l1 1.1a2 2 0 0 0 1.5.7h5.4a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-folder-open" viewBox="0 0 24 24"><path d="M3.5 16.5v-9a2 2 0 0 1 2-2h3.6a2 2 0 0 1 1.5.7l1 1.1a2 2 0 0 0 1.5.7h4.4a2 2 0 0 1 2 2v1"/><path d="M3.6 17.6l2.1-5.9a2 2 0 0 1 1.9-1.3h12.2a1.2 1.2 0 0 1 1.1 1.6l-2 5.8a2 2 0 0 1-1.9 1.4H5.4a1.9 1.9 0 0 1-1.8-1.6z"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M13.5 3.5h-6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-10z"/><path d="M13.5 3.5v5h5"/></symbol>
+    <symbol id="i-file-plus" viewBox="0 0 24 24"><path d="M13.5 3.5h-6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-10z"/><path d="M13.5 3.5v5h5"/><path d="M12 11.5v6M9 14.5h6"/></symbol>
+    <symbol id="i-folder-plus" viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h3.6a2 2 0 0 1 1.5.7l1 1.1a2 2 0 0 0 1.5.7h5.4a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><path d="M12 10.5v5.5M9.25 13.25h5.5"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M14.5 6.5l3 3"/><path d="M4.5 19.5l1-4.2L15.9 4.9a2.1 2.1 0 0 1 3 3L8.6 18.4z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15"/><path d="M9.5 7V5.5A1.5 1.5 0 0 1 11 4h2a1.5 1.5 0 0 1 1.5 1.5V7"/><path d="M6.5 7l.8 11.1a2 2 0 0 0 2 1.9h5.4a2 2 0 0 0 2-1.9L17.5 7"/><path d="M10.25 11v5M13.75 11v5"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><path d="M6 12h.01M12 12h.01M18 12h.01" stroke-width="3"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9.5 6.5l5.5 5.5-5.5 5.5"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6.5 9.5l5.5 5.5 5.5-5.5"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14.5L4.5 10 9 5.5"/><path d="M4.5 10h10a5 5 0 0 1 0 10h-3"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 14.5l4.5-4.5L15 5.5"/><path d="M19.5 10h-10a5 5 0 0 0 0 10h3"/></symbol>
+    <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M4.5 15.5v2a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-2"/></symbol>
+    <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 15V4"/><path d="M7.5 8.5L12 4l4.5 4.5"/><path d="M4.5 15.5v2a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-2"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19.5h14"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5v-2a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-duplicate" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5v-2a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/><path d="M14 11.5v5M11.5 14h5"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3A4 4 0 0 0 13 5.3l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+    <symbol id="i-markdown" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5"/><path d="M6 15V9l2.5 3L11 9v6"/><path d="M16.5 9v5.5M14.5 12.5l2 2 2-2"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.75"/><path d="M12 2.75v2M12 19.25v2M4.75 4.75l1.4 1.4M17.85 17.85l1.4 1.4M2.75 12h2M19.25 12h2M4.75 19.25l1.4-1.4M17.85 6.15l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.6A7.5 7.5 0 1 1 9.4 4.5a6 6 0 0 0 10.1 10.1z"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.6a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.1-2.4 3.5"/><path d="M12 17h.01" stroke-width="2.4"/></symbol>
+    <symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 4.5v15M3.75 16.25L7 19.5l3.25-3.25"/><path d="M13.5 4.5h6l-6 6.5h6"/><path d="M13.5 19.5l3-6.5 3 6.5M14.4 17.6h4.2"/></symbol>
+    <symbol id="i-collapse" viewBox="0 0 24 24"><path d="M8 4.5l4 4 4-4"/><path d="M8 19.5l4-4 4 4"/><path d="M4.5 12h15"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 8.5l4-4 4 4"/><path d="M8 15.5l4 4 4-4"/><path d="M4.5 12h15"/></symbol>
+    <symbol id="i-new" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M12 8.5v7M8.5 12h7"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M5.5 4.5h13a1 1 0 0 1 1 1v8.5l-5.5 5.5h-8.5a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1z"/><path d="M14 19.5v-4.5a1 1 0 0 1 1-1h4.5"/><path d="M8.5 9h7M8.5 12.5h3.5"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M6.5 10.5L12 5l5.5 5.5"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M6.5 13.5L12 19l5.5-5.5"/></symbol>
+    <symbol id="i-outdent" viewBox="0 0 24 24"><path d="M20 6H10M20 12h-7M20 18H10"/><path d="M7.5 9l-3 3 3 3"/></symbol>
+    <symbol id="i-indent" viewBox="0 0 24 24"><path d="M20 6H10M20 12h-7M20 18H10"/><path d="M4.5 9l3 3-3 3"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+    <symbol id="i-install" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="12" rx="2"/><path d="M8.5 20h7M12 16.5V20"/><path d="M12 7.5v5.5M9.75 10.75L12 13l2.25-2.25"/></symbol>
+    <symbol id="i-blank" viewBox="0 0 24 24"></symbol>
+  </svg>
+
+  <div class="app">
+    <header class="topbar">
       <div class="brand">
-        <div class="brand__mark" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <div class="brand__copy">
-          <p class="brand__eyebrow">Vanilla Tree Builder</p>
-          <h1>TreeForge</h1>
-        </div>
+        <img class="brand__logo" src="icons/icon.svg" alt="" width="28" height="28">
+        <span class="brand__name">TreeForge</span>
+        <span class="brand__tag">File trees, drawn in text</span>
       </div>
 
-      <div class="toolbar__actions">
-        <button id="copyButton" class="toolbar-button" type="button">
-          <span class="toolbar-button__icon" aria-hidden="true"></span>
-          <span>Copy Tree</span>
+      <nav class="topbar__actions" aria-label="Main">
+        <button class="btn btn--labelled" id="importBtn" type="button" title="Import a tree, a folder or JSON">
+          <svg class="icon" aria-hidden="true"><use href="#i-import"/></svg><span class="btn__label">Import</span>
         </button>
-        <button id="exportTxtButton" class="toolbar-button" type="button">
-          <span class="toolbar-button__icon" aria-hidden="true"></span>
-          <span>Export .txt</span>
+        <button class="btn btn--labelled" id="exportBtn" type="button" aria-haspopup="menu" aria-expanded="false" title="Copy, download or share">
+          <svg class="icon" aria-hidden="true"><use href="#i-export"/></svg><span class="btn__label">Export</span><svg class="icon icon--caret" aria-hidden="true"><use href="#i-chevron-down"/></svg>
         </button>
-        <button id="importJsonButton" class="toolbar-button" type="button">
-          <span class="toolbar-button__icon" aria-hidden="true"></span>
-          <span>Import JSON</span>
+        <span class="divider" aria-hidden="true"></span>
+        <button class="btn btn--icon" id="undoBtn" type="button" aria-label="Undo" data-shortcut="Mod+Z" disabled>
+          <svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg>
         </button>
-        <button id="exportJsonButton" class="toolbar-button" type="button">
-          <span class="toolbar-button__icon" aria-hidden="true"></span>
-          <span>Export JSON</span>
+        <button class="btn btn--icon" id="redoBtn" type="button" aria-label="Redo" data-shortcut="Mod+Shift+Z" disabled>
+          <svg class="icon" aria-hidden="true"><use href="#i-redo"/></svg>
         </button>
-        <button id="resetButton" class="toolbar-button toolbar-button--danger" type="button">
-          <span class="toolbar-button__icon" aria-hidden="true"></span>
-          <span>Reset</span>
+        <button class="btn btn--icon" id="newBtn" type="button" aria-label="New tree" title="New tree">
+          <svg class="icon" aria-hidden="true"><use href="#i-new"/></svg>
         </button>
-      </div>
+        <span class="divider" aria-hidden="true"></span>
+        <button class="btn btn--primary btn--labelled" id="installBtn" type="button" title="Install TreeForge as an app" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-install"/></svg><span class="btn__label">Install</span>
+        </button>
+        <button class="btn btn--icon" id="themeBtn" type="button" aria-label="Switch theme">
+          <svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg>
+        </button>
+        <button class="btn btn--icon" id="helpBtn" type="button" aria-label="Shortcuts and tips" title="Shortcuts and tips (?)">
+          <svg class="icon" aria-hidden="true"><use href="#i-help"/></svg>
+        </button>
+      </nav>
     </header>
 
     <main class="workspace">
       <section class="panel panel--editor" aria-labelledby="editorTitle">
-        <div class="panel__header">
-          <div>
-            <p class="panel__eyebrow">Left Panel</p>
-            <h2 id="editorTitle">GUI Tree Editor</h2>
+        <header class="panel__head">
+          <div class="panel__title">
+            <h2 id="editorTitle">Structure</h2>
+            <span class="panel__meta" id="stats"></span>
           </div>
-          <p id="statsText" class="panel__meta">1 folder • 0 files</p>
-        </div>
+          <div class="panel__tools" role="toolbar" aria-label="Structure tools">
+            <button class="tool" id="addFileBtn" type="button" title="New file (N)">
+              <svg class="icon" aria-hidden="true"><use href="#i-file-plus"/></svg><span>File</span>
+            </button>
+            <button class="tool" id="addFolderBtn" type="button" title="New folder (Shift+N)">
+              <svg class="icon" aria-hidden="true"><use href="#i-folder-plus"/></svg><span>Folder</span>
+            </button>
+            <span class="tool-sep" aria-hidden="true"></span>
+            <button class="tool tool--icon" id="collapseAllBtn" type="button" aria-label="Collapse all folders" title="Collapse all folders">
+              <svg class="icon" aria-hidden="true"><use href="#i-collapse"/></svg>
+            </button>
+            <button class="tool tool--icon" id="expandAllBtn" type="button" aria-label="Expand all folders" title="Expand all folders">
+              <svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg>
+            </button>
+            <button class="tool tool--icon" id="sortBtn" type="button" aria-label="Sort everything A to Z, folders first" title="Sort A–Z (folders first)">
+              <svg class="icon" aria-hidden="true"><use href="#i-sort"/></svg>
+            </button>
+          </div>
+        </header>
 
-        <div
-          id="treeEditor"
-          class="tree-editor"
-          role="tree"
-          aria-label="File structure editor"
-        ></div>
+        <div class="tree" id="tree" role="tree" aria-labelledby="editorTitle"></div>
 
-        <div class="panel__footer">
-          <span>Shortcuts: Enter rename, Delete remove, Escape cancel</span>
-          <span>Drag items to reorder or move them into folders</span>
-        </div>
+        <footer class="panel__foot">
+          Double-click to rename · type <code>name # note</code> to add a comment · <code>a/b.txt</code> creates folders · drag to move
+        </footer>
       </section>
 
       <section class="panel panel--output" aria-labelledby="outputTitle">
-        <div class="panel__header">
-          <div>
-            <p class="panel__eyebrow">Right Panel</p>
-            <h2 id="outputTitle">ASCII Tree Output</h2>
+        <header class="panel__head">
+          <div class="panel__title">
+            <h2 id="outputTitle">Output</h2>
+            <span class="panel__meta" id="outputMeta"></span>
           </div>
-          <p id="outputMeta" class="panel__meta">1 line</p>
-        </div>
+          <div class="panel__tools">
+            <button class="tool tool--icon" id="copyMdBtn" type="button" aria-label="Copy as Markdown" title="Copy as Markdown">
+              <svg class="icon" aria-hidden="true"><use href="#i-markdown"/></svg>
+            </button>
+            <button class="tool tool--strong" id="copyBtn" type="button" title="Copy to clipboard">
+              <svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span>Copy</span>
+            </button>
+          </div>
+        </header>
 
-        <div class="ascii-frame">
-          <pre id="asciiOutput" class="ascii-output" aria-live="polite"></pre>
-        </div>
+        <form class="options" id="options" aria-label="Output options">
+          <div class="segmented" role="radiogroup" aria-label="Style">
+            <label><input type="radio" name="style" value="unicode"><span>Unicode</span></label>
+            <label><input type="radio" name="style" value="ascii"><span>ASCII</span></label>
+            <label><input type="radio" name="style" value="indent"><span>Indent</span></label>
+            <label><input type="radio" name="style" value="markdown"><span>Markdown</span></label>
+          </div>
+          <div class="toggles">
+            <label class="toggle" title="Print the root folder as the first line"><input type="checkbox" name="showRoot"><span>Root</span></label>
+            <label class="toggle" title="End folder names with a slash"><input type="checkbox" name="trailingSlash"><span>Folder /</span></label>
+            <label class="toggle" title="Show notes as aligned # comments"><input type="checkbox" name="showNotes"><span>Notes</span></label>
+            <label class="toggle" title="Add a line like “3 directories, 7 files”"><input type="checkbox" name="summary"><span>Summary</span></label>
+          </div>
+        </form>
 
-        <div class="panel__footer">
-          <span>Live preview updates as the structure changes</span>
-          <span>Export as plain text whenever you are ready</span>
+        <div class="output-wrap">
+          <pre class="output" id="output" tabindex="0" aria-label="Generated tree" data-empty="Nothing to show — add some files or turn on “Root”."></pre>
         </div>
       </section>
     </main>
   </div>
 
-  <input
-    id="jsonImportInput"
-    type="file"
-    accept=".json,application/json"
-    hidden
-  >
+  <div class="menu" id="menu" role="menu" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="drop-overlay" id="dropOverlay" hidden>
+    <div class="drop-overlay__box">
+      <svg class="icon" aria-hidden="true"><use href="#i-import"/></svg>
+      <strong>Drop to import</strong>
+      <span>A folder, or a .json / .txt / .md file. Nothing is uploaded.</span>
+    </div>
+  </div>
 
-  <div id="toast" class="toast" hidden></div>
+  <input type="file" id="fileInput" accept=".json,.txt,.md,.markdown,.tree,application/json,text/plain,text/markdown" hidden>
+  <input type="file" id="folderInput" webkitdirectory multiple hidden>
 
-  <script src="script.js"></script>
+  <dialog class="dialog dialog--wide" id="importDialog" aria-labelledby="importTitle">
+    <form class="dialog__form" method="dialog">
+      <header class="dialog__head">
+        <h2 id="importTitle">Import</h2>
+        <button class="btn btn--icon btn--ghost" value="cancel" aria-label="Close">
+          <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </header>
+      <div class="dialog__body import">
+        <div class="import__source">
+          <label class="field-label" for="importText">Paste a tree, an indented list, file paths or JSON</label>
+          <textarea id="importText" wrap="off" spellcheck="false" autocomplete="off" placeholder="my-app/&#10;├── src/&#10;│   └── app.js&#10;└── README.md&#10;&#10;…or one path per line:&#10;src/app.js&#10;README.md"></textarea>
+          <div class="import__buttons">
+            <button class="btn" id="openFolderBtn" type="button">
+              <svg class="icon" aria-hidden="true"><use href="#i-folder-open"/></svg>Open folder…
+            </button>
+            <button class="btn" id="openFileBtn" type="button">
+              <svg class="icon" aria-hidden="true"><use href="#i-file"/></svg>Open file…
+            </button>
+          </div>
+          <label class="field-label" for="ignoreInput">Skip these names when reading a folder</label>
+          <input class="input" id="ignoreInput" type="text" spellcheck="false" autocomplete="off" placeholder="node_modules, .git, *.log">
+          <p class="hint">Folders and files are read locally — nothing leaves your browser.</p>
+        </div>
+        <div class="import__preview">
+          <div class="field-label"><span>Preview</span><span class="import__summary" id="importSummary"></span></div>
+          <pre class="output output--preview" id="importPreview" data-empty="The parsed tree will appear here."></pre>
+        </div>
+      </div>
+      <footer class="dialog__foot">
+        <button class="btn" value="cancel">Cancel</button>
+        <button class="btn btn--primary" id="importConfirm" type="button" disabled>Replace tree</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="helpDialog" aria-labelledby="helpTitle">
+    <form class="dialog__form" method="dialog">
+      <header class="dialog__head">
+        <h2 id="helpTitle">Shortcuts &amp; tips</h2>
+        <button class="btn btn--icon btn--ghost" value="cancel" aria-label="Close">
+          <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </header>
+      <div class="dialog__body help">
+        <section>
+          <h3>In the structure panel</h3>
+          <dl class="keys">
+            <div><dt><kbd>↑</kbd> <kbd>↓</kbd></dt><dd>Move the selection</dd></div>
+            <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Collapse / expand, or jump to parent / first child</dd></div>
+            <div><dt><kbd>Enter</kbd> <kbd>F2</kbd></dt><dd>Rename</dd></div>
+            <div><dt><kbd>N</kbd></dt><dd>New file</dd></div>
+            <div><dt><kbd>Shift</kbd> <kbd>N</kbd></dt><dd>New folder</dd></div>
+            <div><dt><kbd>Delete</kbd></dt><dd>Delete</dd></div>
+            <div><dt><kbd>Space</kbd></dt><dd>Collapse or expand a folder</dd></div>
+            <div><dt><kbd data-key="alt">Alt</kbd> <kbd>↑</kbd> <kbd>↓</kbd></dt><dd>Move up / down</dd></div>
+            <div><dt><kbd data-key="alt">Alt</kbd> <kbd>←</kbd> <kbd>→</kbd></dt><dd>Move out of a folder / into the folder above</dd></div>
+            <div><dt><kbd>Shift</kbd> <kbd>F10</kbd></dt><dd>More actions</dd></div>
+          </dl>
+        </section>
+        <section>
+          <h3>Anywhere</h3>
+          <dl class="keys">
+            <div><dt><kbd data-key="mod">Ctrl</kbd> <kbd>Z</kbd></dt><dd>Undo</dd></div>
+            <div><dt><kbd data-key="mod">Ctrl</kbd> <kbd>Shift</kbd> <kbd>Z</kbd></dt><dd>Redo</dd></div>
+            <div><dt><kbd>?</kbd></dt><dd>This help</dd></div>
+          </dl>
+        </section>
+        <section>
+          <h3>Tips</h3>
+          <ul class="tips">
+            <li>While renaming, type <code>app.js # entry point</code> to attach a note. Notes line up as comments in the output.</li>
+            <li>Type a path such as <code>src/lib/util.js</code> to create the missing folders in one go. End a name with <code>/</code> to turn it into a folder.</li>
+            <li><strong>Import</strong> understands <code>tree</code> output (including Windows), indented and Markdown lists, plain path lists and JSON (including <code>tree -J</code>).</li>
+            <li>Drop a folder anywhere on the page to read its structure. Nothing is uploaded.</li>
+            <li>Your work is saved in this browser automatically. Use <strong>Export → Copy share link</strong> to send a tree to someone — the whole tree lives inside the link.</li>
+          </ul>
+        </section>
+      </div>
+      <footer class="dialog__foot">
+        <button class="btn btn--primary" value="close">Got it</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <script src="js/tree.js"></script>
+  <script src="js/format.js"></script>
+  <script src="js/parse.js"></script>
+  <script src="js/share.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
