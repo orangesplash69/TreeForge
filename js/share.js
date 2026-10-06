@@ -3,15 +3,9 @@
  * Packs a tree (plus output options) into a compact, URL-safe string that lives in
  * the link's #hash, so sharing needs no server. Uses deflate when the browser has it.
  */
-(function (global, factory) {
-  "use strict";
-  if (typeof module === "object" && module.exports) {
-    module.exports = factory(require("./tree.js"));
-  } else {
-    global.TreeForge = global.TreeForge || {};
-    global.TreeForge.share = factory(global.TreeForge.tree);
-  }
-})(typeof self !== "undefined" ? self : this, function (T) {
+window.TreeForge = window.TreeForge || {};
+
+window.TreeForge.share = (function (T) {
   "use strict";
 
   const VERSION = 1;
@@ -115,4 +109,4 @@
   }
 
   return { pack, unpack, encode, decode };
-});
+})(window.TreeForge.tree);

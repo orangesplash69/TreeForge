@@ -3,15 +3,9 @@
  * Reads `tree` output (Unicode, ASCII, Windows), indented or Markdown lists,
  * plain path lists and JSON (TreeForge exports, `tree -J`, nested objects).
  */
-(function (global, factory) {
-  "use strict";
-  if (typeof module === "object" && module.exports) {
-    module.exports = factory(require("./tree.js"));
-  } else {
-    global.TreeForge = global.TreeForge || {};
-    global.TreeForge.parse = factory(global.TreeForge.tree);
-  }
-})(typeof self !== "undefined" ? self : this, function (T) {
+window.TreeForge = window.TreeForge || {};
+
+window.TreeForge.parse = (function (T) {
   "use strict";
 
   const MAX_NODES = 20000;
@@ -431,4 +425,4 @@
     fromPaths,
     compileIgnore
   };
-});
+})(window.TreeForge.tree);

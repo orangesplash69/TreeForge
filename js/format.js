@@ -2,15 +2,9 @@
  * TreeForge — text output.
  * Turns a tree into `tree`-style text (Unicode or ASCII), an indented list or a Markdown list.
  */
-(function (global, factory) {
-  "use strict";
-  if (typeof module === "object" && module.exports) {
-    module.exports = factory(require("./tree.js"));
-  } else {
-    global.TreeForge = global.TreeForge || {};
-    global.TreeForge.format = factory(global.TreeForge.tree);
-  }
-})(typeof self !== "undefined" ? self : this, function (T) {
+window.TreeForge = window.TreeForge || {};
+
+window.TreeForge.format = (function (T) {
   "use strict";
 
   const GLYPHS = {
@@ -155,4 +149,4 @@
     formatTree,
     toMarkdown
   };
-});
+})(window.TreeForge.tree);

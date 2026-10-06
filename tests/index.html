@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TreeForge tests</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f3f5f9;
+      --surface: #ffffff;
+      --text: #151a24;
+      --muted: #6b7587;
+      --pass: #12946a;
+      --fail: #d43a50;
+      --border: #e1e5ec;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b0e14;
+        --surface: #11151d;
+        --text: #e6eaf2;
+        --muted: #8a94a8;
+        --pass: #4fd1a5;
+        --fail: #ff6b7d;
+        --border: #242b38;
+      }
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 32px 16px 64px;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 22px;
+    }
+
+    h2 {
+      margin: 28px 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    #summary {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    #summary.pass,
+    li.pass::before {
+      color: var(--pass);
+    }
+
+    #summary.fail,
+    li.fail::before {
+      color: var(--fail);
+    }
+
+    .results {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      list-style: none;
+    }
+
+    .results li {
+      padding: 8px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .results li:first-child {
+      border-top: 0;
+    }
+
+    li.pass::before {
+      content: "✓  ";
+    }
+
+    li.fail::before {
+      content: "✗  ";
+    }
+
+    pre {
+      margin: 8px 0 2px;
+      padding: 10px 12px;
+      overflow: auto;
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--fail);
+      font: 12.5px/1.5 ui-monospace, Menlo, Consolas, monospace;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>TreeForge tests</h1>
+    <p id="summary">Running…</p>
+    <div id="results"></div>
+  </main>
+
+  <script src="../js/tree.js"></script>
+  <script src="../js/format.js"></script>
+  <script src="../js/parse.js"></script>
+  <script src="../js/share.js"></script>
+  <script src="runner.js"></script>
+  <script src="tree.test.js"></script>
+  <script src="format.test.js"></script>
+  <script src="parse.test.js"></script>
+  <script src="share.test.js"></script>
+</body>
+</html>

@@ -13,7 +13,7 @@ my-project/
 └── README.md
 ```
 
-TreeForge is a static web app: no backend, no build step, no dependencies. It runs entirely in your browser, and nothing you type, paste or open is uploaded anywhere.
+TreeForge is 100% static HTML, CSS and JavaScript: no backend, no build step, no npm, no dependencies, nothing to run in the background. It runs entirely in your browser, and nothing you type, paste or open is uploaded anywhere.
 
 ---
 
@@ -56,15 +56,15 @@ TreeForge is a static web app: no backend, no build step, no dependencies. It ru
 
 ## 🚀 Installation
 
-There is nothing to build or install. Pick whichever suits you:
+There is nothing to build, install or start. Pick whichever suits you:
 
 ### 1. Just open it
 
-Download or clone the repository and open `index.html` in your browser. Everything except offline mode and "Install app" works straight from disk. Browsers only allow those two on `http(s)://`.
+Download or clone the repository and double-click `index.html`. Everything except offline mode and "Install app" works straight from disk. Browsers only allow those two on websites.
 
-### 2. Put it on any static host
+### 2. Put it on any web space
 
-Upload the folder as-is to any web server or static host, such as Apache, nginx, GitHub Pages, Netlify, Cloudflare Pages or shared hosting. It can live in a subfolder (for example `/treeforge/`); all paths are relative. No server-side code or configuration is needed.
+Upload the files as-is to any web server or static host, such as shared hosting via FTP, Apache, nginx, GitHub Pages, Netlify or Cloudflare Pages. It can live in a subfolder (for example `/treeforge/`); all paths are relative. No PHP, Node, database or server configuration is needed.
 
 Files to upload:
 
@@ -77,22 +77,11 @@ js/
 icons/
 ```
 
-(`tests/`, `tools/`, `package.json` and `README.md` are only for development and can be left out.)
+(`tests/` and `README.md` aren't needed by the app and can be left out.)
 
 ### 3. Install it as an app
 
-Open the hosted version (served over `https://`, or `http://localhost` for local testing) and click **Install** in the toolbar, or use your browser's *Install app* / *Add to Home Screen*. It then opens in its own window and works offline.
-
-### Run it locally over HTTP
-
-To test offline mode and installing, serve the folder with any static server. A zero-dependency one is included:
-
-```bash
-npm start            # or: node tools/serve.js 8080
-# → http://localhost:8080/
-```
-
-`python3 -m http.server` works just as well.
+Open the hosted version (over `https://`) and click **Install** in the toolbar, or use your browser's *Install app* / *Add to Home Screen*. It then opens in its own window and works offline.
 
 ---
 
@@ -135,7 +124,7 @@ npm start            # or: node tools/serve.js 8080
 
 ## 🛠 Development
 
-Plain HTML, CSS and JavaScript. The scripts are classic (non-module) scripts, so the app also works from `file://`.
+Plain HTML, CSS and JavaScript with no tooling. The scripts are classic (non-module) scripts, so the app also works from `file://`. Edit a file, reload the page, done.
 
 ```
 index.html            page markup and icon sprite
@@ -147,15 +136,10 @@ js/share.js           share-link encoding (compressed, URL-safe)
 js/app.js             user interface
 sw.js                 service worker for offline use
 manifest.webmanifest  app manifest for installing
-tests/                unit tests (Node's built-in test runner)
-tools/serve.js        tiny static server for local testing
+tests/index.html      unit tests — open in a browser to run them
 ```
 
-Run the tests (Node 18+, nothing to install):
-
-```bash
-npm test
-```
+To run the tests, open `tests/index.html` in your browser (directly from disk works too). The page lists every test and shows a pass/fail summary at the top.
 
 If you add, rename or remove a file the app loads, update the `ASSETS` list in `sw.js` and bump its `VERSION`.
 

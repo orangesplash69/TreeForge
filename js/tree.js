@@ -5,15 +5,9 @@
  * A node looks like { id, type: "folder" | "file", name, note, children? }.
  * Only folders carry a `children` array. The root is always a folder.
  */
-(function (global, factory) {
-  "use strict";
-  if (typeof module === "object" && module.exports) {
-    module.exports = factory();
-  } else {
-    global.TreeForge = global.TreeForge || {};
-    global.TreeForge.tree = factory();
-  }
-})(typeof self !== "undefined" ? self : this, function () {
+window.TreeForge = window.TreeForge || {};
+
+window.TreeForge.tree = (function () {
   "use strict";
 
   const ID_PREFIX = Math.random().toString(36).slice(2, 10);
@@ -460,4 +454,4 @@
     toJSON,
     isValidTree
   };
-});
+})();
